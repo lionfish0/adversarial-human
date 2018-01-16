@@ -49,7 +49,6 @@ circle {
 var number = Math.floor(Math.random() * 10);
 document.getElementById("msg").innerHTML="Draw a "+number;
 
-
 var width = 960,
     height = 500;
 
@@ -116,8 +115,6 @@ function redraw() {
 }
 
 function mousedown() {
-   //this adds a new point on click
-//  points.push(selected = dragged = d3.mouse(svg.node()));
   redraw();
 }
 
@@ -139,27 +136,38 @@ d3.select("#done")
     .on("mouseup", done)
 
 function done() {
+  document.getElementById("done").disabled=true;
+  setTimeout(function() {
+    document.getElementById("done").disabled=false;
+    d = (new Date()).getTime();
+  },15000);
+  
   d3.json("https://api.thingspeak.com/update?api_key=7VR95NL25MJDF18L&field1="+points+"&field2="+number, function(error, response) { });
-  points = d3.range(1, 7).map(function(i) {
-    return [i * width / 7, 50 + Math.random() * (height - 100)];
-  });
-  redraw();
 
-  svg.selectAll("path").remove();
-  svg.append("path")
-    .datum(points.slice(0,3))
-    .attr("class", "line")
-    .call(redraw);
+  document.getElementById("msg").innerHTML="Reticulating splines...";
+  var reticmsg = setInterval(function() {
+   points = d3.range(1, 7).map(function(i) {
+     return [i * width / 7, 50 + Math.random() * (height - 100)];
+   });
+   redraw();
+   svg.selectAll("path").remove();
+   svg.append("path")
+     .datum(points.slice(0,3))
+     .attr("class", "line")
+     .call(redraw);
 
-  svg.append("path")
-    .datum(points.slice(3,6))
-    .attr("class", "line")
-    .call(redraw);
-
-  number = number + 2;
-  if (number > 10) {number = 0;}
-  if (number == 10) {number = 1;} 
-  document.getElementById("msg").innerHTML="Draw a "+number;
+   svg.append("path")
+     .datum(points.slice(3,6))
+     .attr("class", "line")
+     .call(redraw);
+  },500);
+  setTimeout(function() {
+   window.clearInterval(reticmsg);
+   number = number + 2;
+   if (number > 10) {number = 0;}
+   if (number == 10) {number = 1;}
+   document.getElementById("msg").innerHTML="Draw a "+number;
+  },2000);
 }
 
 </script>
