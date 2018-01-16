@@ -41,12 +41,14 @@ circle {
 
 </style>
 <form>
-<span id="msg">Draw a 3</span>
+<span id="msg">Draw a ?</span>
 <input type='button' value='done' id='done' />
 </form>
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
-var number = 3;
+var number = Math.floor(Math.random() * 10);
+document.getElementById("msg").innerHTML="Draw a "+number;
+
 
 var width = 960,
     height = 500;
@@ -154,7 +156,9 @@ function done() {
     .attr("class", "line")
     .call(redraw);
 
-  if (number == 3) {number = 4;} else {number=3;}
+  number = number + 2;
+  if (number > 10) {number = 0;}
+  if (number == 10) {number = 1;} 
   document.getElementById("msg").innerHTML="Draw a "+number;
 }
 
