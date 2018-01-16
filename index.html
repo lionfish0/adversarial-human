@@ -41,23 +41,25 @@ circle {
 
 </style>
 <form>
-  <label for="interpolate">Interpolate:</label>
-  <select id="interpolate"></select><br>
+<span id="msg">Draw a 3</span>
+<input type='button' value='done' id='done' />
 </form>
-<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 <script>
+var number = 3;
 
 var width = 960,
     height = 500;
 
-var points = d3.range(1, 5).map(function(i) {
-  return [i * width / 5, 50 + Math.random() * (height - 100)];
+var points = d3.range(1, 7).map(function(i) {
+  return [i * width / 7, 50 + Math.random() * (height - 100)];
 });
 
 var dragged = null,
     selected = points[0];
 
 var line = d3.svg.line();
+line.interpolate("cardinal");
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -70,38 +72,22 @@ svg.append("rect")
     .on("mousedown", mousedown);
 
 svg.append("path")
-    .datum(points)
+    .datum(points.slice(0,3))
+    .attr("class", "line")
+    .call(redraw);
+
+svg.append("path")
+    .datum(points.slice(3,6))
     .attr("class", "line")
     .call(redraw);
 
 d3.select(window)
     .on("mousemove", mousemove)
-    .on("mouseup", mouseup)
-    .on("keydown", keydown);
-
-d3.select("#interpolate")
-    .on("change", change)
-  .selectAll("option")
-    .data([
-      "linear",
-      "step-before",
-      "step-after",
-      "basis",
-      "basis-open",
-      "basis-closed",
-      "cardinal",
-      "cardinal-open",
-      "cardinal-closed",
-      "monotone"
-    ])
-  .enter().append("option")
-    .attr("value", function(d) { return d; })
-    .text(function(d) { return d; });
-
+    .on("mouseup", mouseup);
 svg.node().focus();
 
 function redraw() {
-  svg.select("path").attr("d", line);
+  svg.selectAll("path").attr("d", line);
 
   var circle = svg.selectAll("circle")
       .data(points, function(d) { return d; });
@@ -112,7 +98,7 @@ function redraw() {
     .transition()
       .duration(750)
       .ease("elastic")
-      .attr("r", 6.5);
+      .attr("r", 20);
 
   circle
       .classed("selected", function(d) { return d === selected; })
@@ -127,13 +113,9 @@ function redraw() {
   }
 }
 
-function change() {
-  line.interpolate(this.value);
-  redraw();
-}
-
 function mousedown() {
-  points.push(selected = dragged = d3.mouse(svg.node()));
+   //this adds a new point on click
+//  points.push(selected = dragged = d3.mouse(svg.node()));
   redraw();
 }
 
@@ -151,18 +133,29 @@ function mouseup() {
   dragged = null;
 }
 
-function keydown() {
-  if (!selected) return;
-  switch (d3.event.keyCode) {
-    case 8: // backspace
-    case 46: { // delete
-      var i = points.indexOf(selected);
-      points.splice(i, 1);
-      selected = points.length ? points[i > 0 ? i - 1 : 0] : null;
-      redraw();
-      break;
-    }
-  }
+d3.select("#done")
+    .on("mouseup", done)
+
+function done() {
+  d3.json("https://api.thingspeak.com/update?api_key=7VR95NL25MJDF18L&field1="+points+"&field2="+number, function(error, response) { });
+  points = d3.range(1, 7).map(function(i) {
+    return [i * width / 7, 50 + Math.random() * (height - 100)];
+  });
+  redraw();
+
+  svg.selectAll("path").remove();
+  svg.append("path")
+    .datum(points.slice(0,3))
+    .attr("class", "line")
+    .call(redraw);
+
+  svg.append("path")
+    .datum(points.slice(3,6))
+    .attr("class", "line")
+    .call(redraw);
+
+  if (number == 3) {number = 4;} else {number=3;}
+  document.getElementById("msg").innerHTML="Draw a "+number;
 }
 
 </script>
