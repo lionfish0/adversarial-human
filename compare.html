@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Spline Editor</title>
+<style>
+
+body {
+  font: 13px sans-serif;
+  position: relative;
+  width: 960px;
+  height: 500px;
+}
+
+form {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+rect {
+  fill: none;
+  pointer-events: all;
+}
+
+circle,
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+circle {
+  fill: #fff;
+  fill-opacity: .2;
+  cursor: move;
+}
+
+.selected {
+  fill: #ff7f0e;
+  stroke: #ff7f0e;
+}
+
+</style>
+<form>
+<span id="msg">Draw a ?</span>
+<input type='button' value='left' id='left' />
+<input type='button' value='right' id='right' />
+</form>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-collection.v1.min.js"></script>
+<script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+<script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+<script src="https://d3js.org/d3-request.v1.min.js"></script>
+
+
+<script>
+document.getElementById("msg").innerHTML="Which looks most like a "+number;
+var number = 1;
+var width = 960,
+    height = 500;
+
+var points = d3.range(1, 13).map(function(i) {
+  return [i * width / 14, 50 + Math.random() * (height - 100)];
+});
+
+
+var line = d3.svg.line();
+line.interpolate("cardinal");
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("tabindex", 1);
+svg.append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+function sortcircles() {
+svg.append("path")
+    .datum(points.slice(0,3))
+    .attr("class", "line")
+    .call(redraw);
+svg.append("path")
+    .datum(points.slice(3,6))
+    .attr("class", "line")
+    .call(redraw);
+svg.append("path")
+    .datum(points.slice(6,9))
+    .attr("class", "line")
+    .call(redraw);
+svg.append("path")
+    .datum(points.slice(9,12))
+    .attr("class", "line")
+    .call(redraw);
+}
+ 
+sortcircles();
+  
+function redraw() {
+  svg.selectAll("path").attr("d", line);
+
+  var circle = svg.selectAll("circle")
+      .data(points, function(d) { return d; });
+
+  circle.enter().append("circle")
+      .attr("r", 1e-6)
+    .transition()
+      .duration(750)
+      .ease("elastic")
+      .attr("r", 20);
+
+  circle
+      .attr("cx", function(d) { return d[0]; })
+      .attr("cy", function(d) { return d[1]; });
+
+  circle.exit().remove();
+
+  if (d3.event) {
+    d3.event.preventDefault();
+    d3.event.stopPropagation();
+  }
+}
+
+d3.select("#left")
+    .on("mouseup", left)
+d3.select("#right")
+    .on("mouseup", right)
+    
+function left() {
+    
+   d3.request("http://54.171.145.244:8080/")
+    .mimeType("text/csv")
+    .get(callback);
+}
+function callback(response) {
+   points = d3.range(1, 13).map(function(i) {
+     return [i * width / 14, 50 + Math.random() * (height - 100)];
+   });
+   redraw();
+   svg.selectAll("path").remove();
+   sortcircles();  
+}
+function right() {
+alert("RIGHT");
+}
+
+</script>
