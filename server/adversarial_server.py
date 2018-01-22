@@ -32,7 +32,7 @@ def getcomparison(comparisonid,choice):
     coords = json.loads(chosen_test.coords)
     chosen_test2 = totest.iloc[np.random.randint(len(totest))]
     coords2 = np.array(json.loads(chosen_test2.coords))
-    coords2[:,0]+=300
+    coords2[:,0]+=400
     coords.extend(coords2.tolist())
     
     return json.dumps({'number':int(chosen_test.target), 'coords':coords})
