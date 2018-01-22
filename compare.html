@@ -7,7 +7,7 @@ body {
   font: 13px sans-serif;
   position: relative;
   width: 960px;
-  height: 500px;
+  height: 650px;
 }
 
 form {
@@ -39,10 +39,16 @@ circle {
   stroke: #ff7f0e;
 }
 
+input {
+  width: 200px;
+  height: 100px;
+}
+
 </style>
 <form>
-<span id="msg"></span>
-<input type='button' value='left' id='left' />
+<p align="center"><span id="msg"></span></p><br/>
+<input type='button' value='left' id='left'/>
+<input type='button' value='neither' id='neither' />
 <input type='button' value='right' id='right' />
 </form>
 <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -122,30 +128,31 @@ function redraw() {
 
 d3.select("#left")
     .on("mouseup", left)
+d3.select("#neither")
+    .on("mouseup", neither)    
 d3.select("#right")
     .on("mouseup", right)
-    
+
+
 function left() {
     choice(0);
 }
 function right() {
-    choice(2)
+    choice(2);
 }
 function neither() {
-    choice(1)
+    choice(1);
 }
 
 function choice(decision)
-   d3.request("http://54.171.145.244:8080/getcomparison/"+comparisonid+"/"+decision)
+   d3.request("http://54.171.145.244:8080/getcomparison/"+JSON.stringify(points)+"/"+decision)
     .mimeType("text/csv")
     .get(callback);
     
 function callback(response) {
    resp = JSON.parse(response.response);
    jsoncoords = resp.coords;
-   alert(points[0]);
    points = jsoncoords;
-   alert(points[0]);
    redraw();
    svg.selectAll("path").remove();
    sortcircles();  
@@ -154,5 +161,6 @@ function callback(response) {
 
 }
 
+choice(-1);
 
 </script>
