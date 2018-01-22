@@ -41,7 +41,7 @@ circle {
 
 </style>
 <form>
-<span id="msg">Draw a ?</span>
+<span id="msg"></span>
 <input type='button' value='left' id='left' />
 <input type='button' value='right' id='right' />
 </form>
@@ -55,6 +55,7 @@ circle {
 <script>
 document.getElementById("msg").innerHTML="Which looks most like a "+number;
 var number = 1;
+var comparisonid = -1;
 var width = 960,
     height = 500;
 
@@ -125,21 +126,33 @@ d3.select("#right")
     .on("mouseup", right)
     
 function left() {
-    
-   d3.request("http://54.171.145.244:8080/")
+    choice(0);
+}
+function right() {
+    choice(2)
+}
+function neither() {
+    choice(1)
+}
+
+function choice(decision)
+   d3.request("http://54.171.145.244:8080/getcomparison/"+comparisonid+"/"+decision)
     .mimeType("text/csv")
     .get(callback);
-}
+    
 function callback(response) {
-   points = d3.range(1, 13).map(function(i) {
-     return [i * width / 14, 50 + Math.random() * (height - 100)];
-   });
+   resp = JSON.parse(response.response);
+   jsoncoords = resp.coords;
+   alert(points[0]);
+   points = jsoncoords;
+   alert(points[0]);
    redraw();
    svg.selectAll("path").remove();
    sortcircles();  
+   var number = resp.number;
+   document.getElementById("msg").innerHTML="Which looks most like a "+number;
+
 }
-function right() {
-alert("RIGHT");
-}
+
 
 </script>
