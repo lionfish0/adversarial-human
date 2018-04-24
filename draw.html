@@ -153,7 +153,7 @@ function done() {
     d = (new Date()).getTime();
   },3000);
   
-  d3.request("http://54.171.145.244:8080/drawn/"+number+"/"+JSON.stringify(points))
+  d3.request("http://34.242.171.140:8080/drawn/"+number+"/"+JSON.stringify(points))
     .mimeType("text/csv")
     .get(function(response){});
     
