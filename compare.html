@@ -145,7 +145,7 @@ function neither() {
 }
 
 function choice(decision) {
-   d3.request("http://54.171.145.244:8080/getcomparison/"+JSON.stringify(points)+"/"+decision)
+   d3.request("http://34.242.171.140:8080/getcomparison/"+JSON.stringify(points)+"/"+decision)
     .mimeType("text/csv")
     .get(callback);
 }
