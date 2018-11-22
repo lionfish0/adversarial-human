@@ -5,7 +5,7 @@ import numpy as np
 import json
 
 app = Flask(__name__)
-CORS(app)
+CORS(app,support_credentials=True)
 
 @app.route('/')
 def hello_world():
@@ -22,11 +22,12 @@ def drawn(number,coordinates):
     
 @app.route('/getcomparison/<comparisonid>/<choice>')
 def getcomparison(comparisonid,choice):
-    
+    print(comparisonid,choice)
     df = pd.DataFrame({'comparisonid':[comparisonid],'choice':[choice]})
     with open('comparison_record.csv', 'a') as f:
         df.to_csv(f, header=False)
-    totest = pd.read_csv('comparison_tests.csv')
+    fileid = np.random.randint(20)
+    totest = pd.read_csv('comparison_tests_%d.csv' % fileid)
     
     chosen_test = totest.iloc[np.random.randint(len(totest))]
     coords = json.loads(chosen_test.coords)

@@ -1,0 +1,7 @@
+cd /home/ubuntu/adversarial-human/server
+#export FLASK_APP=adversarial_server.py
+#flask run --host=0.0.0.0 --port=8080
+pip install gunicorn
+gunicorn adversarial_server:app -b 0.0.0.0:8080
+cd /home/ubuntu/pages
+python -m http.server
